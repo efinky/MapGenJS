@@ -27,7 +27,7 @@ export async function run() {
     updateCanvasSize(document, canvas);
 
     //Initialize Map
-    let map = new Map(100,100);
+    let map = new Map(300,300);
     let squareWidth = 3;
 
     //populate map
@@ -74,9 +74,20 @@ export async function run() {
         }
 
         if (keepGoing) {
-            keepGoing = generateOutFromCenter();
-            updateMap(map);
+            let steps = 0;
+
+            while (keepGoing) {
+                keepGoing = generateOutFromCenter();
+                steps++;
+                if (steps > 1000) {
+                    break;
+                }
+            }
+
         }
+        
+        updateMap(map);
+
 
         //mapCurrent.draw(ctx, viewportOrigin_w, canvasSize);
         //let playerImageId = playerSet.getPlayerImageId(worldState.player.class, worldState.player.direction, worldState.player.step);

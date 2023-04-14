@@ -24,8 +24,8 @@ class MountainMap {
         this.width = pWidth;
         this.height = pHeight;
         this.rows = [];
-        this.variation = 10;
-        this.distOfVariation = 30;
+        this.variation = 5;
+        this.distOfVariation = 20;
         this.maxElevation = 10;
         this.minElevation = 1;
         this.length = pWidth;
@@ -170,7 +170,7 @@ export function startGeneration(map) {
         //  
     }
 
-    let numRidges = 0;// Math.floor(numPoints/3) + 1;
+    let numRidges =  Math.floor(numPoints/3) + 1;
     //
 
     for (let i = 0; i < numRidges; i++) {
@@ -219,7 +219,7 @@ export function startGeneration(map) {
 
 export function generateOutFromCenter() {
 
-    if (open.count == 0) {
+    if (open.empty()) {
         return false;
     }
     // while (open.count != 0) {
@@ -311,7 +311,7 @@ function compareSurroundingSquaresElevation(squares) {
 
     let tempList = []
     squares.forEach(square => {
-        if (square.elevation != 0) {
+        if (square.elevation != 3) {
             tempList.push(square);
         }
     });
