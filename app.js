@@ -4,6 +4,7 @@ import { Map, MapPoint } from "./map.js";
 
 //import * as ShoreLine from "./genShoreLine.js";
 import { genShoreline } from "./genShoreLine.js";
+import { genOcean } from "./genOcean.js";
 import { generateOutFromCenter, genMountain, startGeneration, updateMap } from "./mountainGen.js";
 
 
@@ -28,7 +29,7 @@ export async function run() {
 
     //Initialize Map
     let map = new Map(300,300);
-    let squareWidth = 3;
+    let squareWidth = 2;
 
     //populate map
     for (let i = 0; i < map.width; i++){
@@ -40,7 +41,8 @@ export async function run() {
     }
     
     //generate the shoreline
-    //genShoreline(map.width, map)
+    genShoreline(map.width, map);
+    genOcean(map);
     // genMountain(map);
     startGeneration(map);
 

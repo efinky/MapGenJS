@@ -170,7 +170,7 @@ export function startGeneration(map) {
         //  
     }
 
-    let numRidges =  Math.floor(numPoints/3) + 1;
+    let numRidges = Math.floor(numPoints/3) + 1;
     //
 
     for (let i = 0; i < numRidges; i++) {
