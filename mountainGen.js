@@ -87,7 +87,7 @@ let tempMap = null;
  * 
  * @param {Map} map 
  */
-export function updateMap(map) {
+export function updateMapMountain(map) {
     tempMap.length = map.width;
     for (let i = 0; i < tempMap.length; i++) {
         for (let j = 0; j < tempMap.length; j++) {
@@ -136,27 +136,12 @@ function initMap(map) {
     }
 }
 
-/**
- * 
- * @param {Map} map 
- */
-export function genMountain(map) {
-    
 
-    startGeneration(map);
-
-    while (generateOutFromCenter()) {
-
-    }
-    // generateOutFromCenter();
-
-    updateMap(map);
-}
 
 /**
  * @param {Map} map 
  */
-export function startGeneration(map) {
+export function startGenerationMountain(map) {
     initMap(map);
     let numPoints = 2//Math.floor(tempMap.length/100) + 1;
     // 
@@ -217,7 +202,7 @@ export function startGeneration(map) {
     });
 }
 
-export function generateOutFromCenter() {
+export function generateOutFromCenterMountain() {
 
     if (open.empty()) {
         return false;

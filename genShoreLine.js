@@ -26,8 +26,6 @@ let points = [];
 export function genShoreline(pLength, pMap) {
 	length = pLength;
 	map = pMap;
-	console.log(length);
-	console.log("here");
 	createSections();
 	createPoints();
 	connectPoints();
@@ -126,13 +124,11 @@ function createPoints() {
 		}
 		count += 1;
 	})
-	console.log(points);
 }
 function connectPoints() {
 	let i = 1;
 	let prev = points[0]
 	let lastPoint = points.length - 1;
-	console.log("points.lneght", points.length);
 	while (i < points.length) {
 		genEdge(prev.x, prev.y, points[i].x, points[i].y)
 
@@ -150,7 +146,6 @@ function connectPoints() {
  * @returns 
  */
 function map_section_edge(x, y, angle, tile_name) {
-	console.log(x,y);
 
 	map.getMapPoint(check_xy(x),check_xy(y)).elevation = tile_name
 	map.getMapPoint(check_xy(x),check_xy(y)).type = "ShoreLine"
@@ -258,9 +253,9 @@ function genEdge(x1, y1, x2, y2, tile_name = 0) {
 			//tile_name = 5
 		}
 		point = map_section_edge(point.x, point.y, angle, tile_name)
-		console.log("here1");
-		console.log("d", distance);
-		console.log("angle", angle);
+
+
+
 		//distance = find_distance(point.x,point.y,x2,y2,initial_angle)
 		//width = find_width(point.x,point.y,x1,y1,x2,y2)
 
@@ -363,7 +358,7 @@ function find_angle_section(angle, center, variance = 2, new_center = 0, increme
 		}
 		//change by one degree either way, or stay same direction
 		let turn = randomNumber(-1, 1);
-		console.log("turn", turn);
+
 		index += turn;
 		if (variance == 2) {
 			if (index < 0) {

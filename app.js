@@ -5,9 +5,44 @@ import { Map, MapPoint } from "./map.js";
 //import * as ShoreLine from "./genShoreLine.js";
 import { genShoreline } from "./genShoreLine.js";
 import { genOcean } from "./genOcean.js";
-import { generateOutFromCenter, genMountain, startGeneration, updateMap } from "./mountainGen.js";
+import { genRegions, generateOutFromCenterRegion, updateRegionMap} from "./genRegions.js";
+import { generateOutFromCenterMountain,  startGenerationMountain, updateMapMountain } from "./mountainGen.js";
 
 
+
+class MapGenerator {
+    constructor() {
+        this.map = new Map(300, 300);
+        this.squareWidth = 2;
+        this.smooth_i = 0
+        this.smooth_j = 0;
+        this.copied = false;
+
+        /**@type {number[][]} */
+        this.smoothedMap = [];
+
+        
+        //populate map
+        for (let i = 0; i < map.width; i++){
+            let row = []
+            for (let j = 0; j < map.height; j++) {
+                row.push(new MapPoint(i, j, -1, "Land"));
+            }
+            map.addRow(row);
+        }
+        
+        //generate the shoreline
+        genShoreline(map.width, map);
+        genOcean(map);
+        // genMountain(map);
+        //startGenerationMountain(map);
+        
+        genRegions(map,9);
+        //smoothMap();
+        
+    }
+
+}
 
 
 export async function run() {
@@ -19,7 +54,7 @@ export async function run() {
     }
     window.addEventListener('resize', () => {
         if (!(canvas instanceof HTMLCanvasElement)) {
-            console.log("Canvas is null... there is no hope");
+            //console.log("Canvas is null... there is no hope");
             return;
         }
         updateCanvasSize(document, canvas);
@@ -30,6 +65,12 @@ export async function run() {
     //Initialize Map
     let map = new Map(300,300);
     let squareWidth = 2;
+    let smooth_i = 0
+    let smooth_j = 0;
+    let copied = false;
+
+    /**@type {number[][]} */
+    let smoothedMap = [];
 
     //populate map
     for (let i = 0; i < map.width; i++){
@@ -44,7 +85,185 @@ export async function run() {
     genShoreline(map.width, map);
     genOcean(map);
     // genMountain(map);
-    startGeneration(map);
+    //startGenerationMountain(map);
+    
+    genRegions(map,9);
+    //smoothMap();
+
+    function copyMap() {
+        for (let i = 0; i < map.width; i++) {
+            smoothedMap.push([]);
+            for (let j = 0; j < map.width; j++) {
+                smoothedMap[i][j] = map.getMapPoint(i, j).elevation;
+            }
+            smoothedMap[i].push([]);
+        }
+        copied = true;
+    }
+    function fastSmoothMap() {
+        
+        for (let i = 0; i < map.width; i++) {
+            for (let j = 0; j < map.width; j++) {
+                let temp_a = getSurroundingNodesElevation(smooth_i, smooth_j)
+                ////console.log(temp_a)
+                let temp = compareNodeElevation(temp_a);
+                
+                //console.log("here3", temp_a);
+                if (temp > 0) {
+                    //smoothedMap[smooth_i][smooth_j] = Math.floor(temp)
+                    map.getMapPoint(smooth_i,smooth_j).elevation = Math.floor(temp);
+                    
+                //console.log("here4");
+                }
+            }
+        }
+    }
+    function smoothMap () {
+        if (smooth_i < map.width)
+        {
+            //console.log("here1", smooth_i, smooth_j);
+            if (smooth_j == map.width-1) {
+                smooth_i++;
+                smooth_j = 0;
+                //console.log("here2");
+            }
+            else{
+                let temp_a = getSurroundingNodesElevation(smooth_i, smooth_j)
+                ////console.log(temp_a)
+				let temp = compareNodeElevation(temp_a);
+                
+                //console.log("here3", temp_a);
+                if (temp > 0) {
+				    //smoothedMap[smooth_i][smooth_j] = Math.floor(temp)
+                    map.getMapPoint(smooth_i,smooth_j).elevation = Math.floor(temp);
+                    
+                 //console.log("here4");
+                }
+                smooth_j++;
+            }
+            return false;
+        }
+        else
+        {
+            
+            //console.log("here5");
+            return true;
+        }
+    }
+    /**
+     * 
+     * @param {number[]} elevations 
+     */
+    function compareNodeElevation(elevations){
+        let min = 0;
+        let max = 1;
+        let count = 0;
+        let sum = 0;
+        elevations.forEach(e => {
+            if (e < min) {
+                min = e;
+            }
+            if (e > max) {
+                max = e;
+            }
+            count++;
+            sum += e;
+        });
+        if (max - min > 3) {
+            return Math.floor(sum/count);
+        }
+        else {
+            return -1
+        }
+    }
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @returns 
+     */
+    function getSurroundingNodesElevation(x, y) {
+		let temp_a = []
+		for (let i = x-1; i <= x+1; i++) {
+			for (let j = y-1;j <= y+1; j++) {
+				if (i >= 0 && j >= 0 && i < map.width && j < map.width) {
+					if (smoothedMap[i][j] > 1) {
+						temp_a.push(smoothedMap[i][j]);
+					}
+				}
+			}
+		}
+		return temp_a
+	} 
+    function drawStuff() {
+
+        
+        if (keepGoingRegion){//} && !keepGoingMountain) {
+            let steps = 0;
+
+            while (keepGoingRegion) {
+                keepGoingRegion = generateOutFromCenterRegion();
+                steps++;
+                if (steps > 1000) {
+                    break;
+                }
+            }
+
+            updateRegionMap(map);
+            
+        }
+
+        /*if (!keepGoingRegion &&keepGoingRegion2){//} && !keepGoingMountain) {
+            let steps = 0;
+            console.log("jere");
+            while (keepGoingRegion) {
+                keepGoingRegion = generateOutFromCenterRegion();
+                steps++;
+                if (steps > 1000) {
+                    break;
+                }
+            }
+
+            updateRegionMap(map);
+        }*/
+        
+        /*
+        if (keepGoingMountain) {
+            let steps = 0;
+
+            while (keepGoingMountain) {
+                keepGoingMountain = generateOutFromCenterMountain();
+                steps++;
+                if (steps > 1000) {
+                    break;
+                }
+            }
+            
+            updateMapMountain(map);
+        }
+        */
+    
+        
+        
+        keepGoingMountain = false;
+
+        if (!copied) {
+            copyMap();
+        }
+        
+        
+        if (!keepGoingMountain && !keepGoingRegion &&!smoothed) {
+            //fastSmoothMap();
+            //smoothed = smoothMap();
+            smoothed = true;
+        }
+        if (!keepGoingMountain && !keepGoingRegion) {
+            return null;
+        }
+        else {
+            return map;
+        } 
+    }
 
 
     
@@ -52,7 +271,10 @@ export async function run() {
 
     window.requestAnimationFrame(draw);
 
-    let keepGoing = true;
+    let keepGoingMountain = true;
+    let keepGoingRegion = true;
+    let keepGoingRegion2 = true;
+    let smoothed = false;
 
 
 
@@ -75,43 +297,7 @@ export async function run() {
             return null;
         }
 
-        if (keepGoing) {
-            let steps = 0;
-
-            while (keepGoing) {
-                keepGoing = generateOutFromCenter();
-                steps++;
-                if (steps > 1000) {
-                    break;
-                }
-            }
-
-        }
-        
-        updateMap(map);
-
-
-        //mapCurrent.draw(ctx, viewportOrigin_w, canvasSize);
-        //let playerImageId = playerSet.getPlayerImageId(worldState.player.class, worldState.player.direction, worldState.player.step);
-        //playerSet.draw(playerImageId, ctx, worldState.player.characterPos_w.sub(viewportOrigin_w));
-        /*
-        for (const character of characters) {
-            const {x, y} = character.characterPos_w.sub(viewportOrigin_w);
-
-            if (character.hp !== character.maxHp){
-                const health_percent = (character.hp / character.maxHp);
-                const w = health_percent * 32;
-                ctx.fillStyle = "#00FF00";
-                if (health_percent < 0.7) {
-                    ctx.fillStyle = "#FFFF00";
-                }
-                if (health_percent < 0.4) {
-                    ctx.fillStyle = "#FF0000";
-                }
-                ctx.fillRect(x, y-3, w, 2);
-            }
-        }
-*/
+        //drawStuff();
         for (let i = 0; i < map.width; i++) {
             for (let j = 0; j < map.height; j++) {
                 let point = map.getMapPoint(i, j);

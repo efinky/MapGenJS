@@ -31,13 +31,10 @@ let open = [];
  */
 export function genOcean(map) {
     length = map.width;
-    console.log('map', map);
     for (let i = 0; i < length; i++) {
         let row = [];
         for (let j = 0; j < length; j++) {
-            console.log(i);
             let elevation = map.getMapPoint(i,j).elevation;
-            console.log('ele', elevation);
             let closed = false;
             if (elevation != -1) {
                 closed = true;
