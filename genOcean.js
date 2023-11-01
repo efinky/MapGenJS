@@ -23,17 +23,19 @@ class OceanSquare {
 }
 
 let tempMap = []
-let length = 0;
+let width = 0;
+let height = 0;
 let open = [];
 /**
  * 
  * @param {Map} map 
  */
 export function genOcean(map) {
-    length = map.width;
-    for (let i = 0; i < length; i++) {
+    width = map.width;
+    height = map.height;
+    for (let i = 0; i < width; i++) {
         let row = [];
-        for (let j = 0; j < length; j++) {
+        for (let j = 0; j < height; j++) {
             let elevation = map.getMapPoint(i,j).elevation;
             let closed = false;
             if (elevation != -1) {
@@ -45,9 +47,9 @@ export function genOcean(map) {
     }
     fillOcean();
 
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < width; i++) {
         let row = [];
-        for (let j = 0; j < length; j++) {
+        for (let j = 0; j < height; j++) {
             map.getMapPoint(i,j).elevation = tempMap[i][j].elevation;
             map.getMapPoint(i,j).type = tempMap[i][j].type;
         }
@@ -59,9 +61,9 @@ export function genOcean(map) {
 function fillOcean() {
     let startSquaress = [];
     startSquaress.push(tempMap[0][0]);
-    startSquaress.push(tempMap[0][length-1]);
-    startSquaress.push(tempMap[length-1][0]);
-    startSquaress.push(tempMap[length-1][length-1]);
+    startSquaress.push(tempMap[0][height-1]);
+    startSquaress.push(tempMap[width-1][0]);
+    startSquaress.push(tempMap[width-1][height-1]);
 
     startSquaress.forEach(square => {
         tempMap[square.x][square.y].closed = true
@@ -96,10 +98,10 @@ function searchSurroundingSquares(square) {
     let x = square.x
     let y = square.y
     
-    checkSquare(checkXY(x-1), checkXY(y))
-    checkSquare(checkXY(x+1), checkXY(y))
-    checkSquare(checkXY(x), checkXY(y-1))
-    checkSquare(checkXY(x), checkXY(y+1))
+    checkSquare(checkX(x-1), checkX(y))
+    checkSquare(checkX(x+1), checkX(y))
+    checkSquare(checkX(x), checkX(y-1))
+    checkSquare(checkX(x), checkX(y+1))
 
 }
 /**
@@ -108,7 +110,7 @@ function searchSurroundingSquares(square) {
  * @param {number} y 
  */
 function checkSquare(x, y) {
-    if ((x >= 0) && (y >= 0) && (x < length) && (y < length))
+    if ((x >= 0) && (y >= 0) && (x < width) && (y < height))
     if (!tempMap[x][y].closed) {
         if(!(tempMap[x][y].open)) {
             tempMap[x][y].open = true
@@ -119,14 +121,27 @@ function checkSquare(x, y) {
 }
 /**
  * 
- * @param {number} xy 
+ * @param {number} x 
  */
-function checkXY(xy) {
-    if (xy >= length) {
-        xy = xy - length
+function checkX(x) {
+    if (x >= width) {
+        x = x - width
     }
-    else if (xy < 0) {
-        xy = xy + (length)
+    else if (x < 0) {
+        x = x + (width)
     }
-    return xy;
+    return x;
+}
+/**
+ * 
+ * @param {number} y 
+ */
+function checkY(y) {
+    if (y >= height) {
+        y = y - height
+    }
+    else if (y < 0) {
+        y = y + (height)
+    }
+    return y;
 }

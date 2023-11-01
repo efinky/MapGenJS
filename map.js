@@ -17,10 +17,20 @@ export class MapPoint {
         this.type = type;
     }
 
+    /**
+     * 
+     * @param {number} r 
+     * @param {number} g 
+     * @param {number} b 
+     */
+    rgbToHex(r, g, b) {
+        return '#' + r.toString(16) + g.toString(16) + b.toString(16);
+    }
     draw() {
 
-        let color = "#FF0000";
-        if (this.elevation === 0) {
+
+        let color = this.rgbToHex(this.elevation*3, this.elevation*3, this.elevation*3)
+        /*if (this.elevation === 0) {
     
             color = "#1E3357";
         }
@@ -67,7 +77,7 @@ export class MapPoint {
     
             
             color = "#F9F9F9";
-        }
+        }*/
         return color;
     }
 }

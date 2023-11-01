@@ -5,7 +5,7 @@ import { Map, MapPoint } from "./map.js";
 //import * as ShoreLine from "./genShoreLine.js";
 import { genShoreline } from "./genShoreLine.js";
 import { genOcean } from "./genOcean.js";
-import { genRegions, generateOutFromCenterRegion, updateRegionMap} from "./genRegions.js";
+import { Regions} from "./genRegions.js";
 import { generateOutFromCenterMountain,  startGenerationMountain, updateMapMountain } from "./mountainGen.js";
 
 
@@ -39,7 +39,7 @@ export class MapGenerator {
         // genMountain(this.map);
         //startGenerationMountain(this.map);
         
-        genRegions(this.map,9);
+        this.regions  = Regions.genRegions(this.map,85, 20, 9);
         //smoothMap();
         
     }
@@ -80,7 +80,7 @@ export class MapGenerator {
 		let temp_a = []
 		for (let i = x-1; i <= x+1; i++) {
 			for (let j = y-1;j <= y+1; j++) {
-				if (i >= 0 && j >= 0 && i < this.map.width && j < this.map.width) {
+				if (i >= 0 && j >= 0 && i < this.map.width && j < this.map.height) {
 					if (this.smoothedMap[i][j] > 1) {
 						temp_a.push(this.smoothedMap[i][j]);
 					}
@@ -96,14 +96,14 @@ export class MapGenerator {
             let steps = 0;
 
             while (this.keepGoingRegion) {
-                this.keepGoingRegion = generateOutFromCenterRegion();
+                this.keepGoingRegion = this.regions.generateOutFromCenterRegion();
                 steps++;
                 if (steps > 1000) {
                     break;
                 }
             }
 
-            updateRegionMap(this.map);
+            this.regions.updateRegionMap(this.map);
             
         }
 
