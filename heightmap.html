@@ -17,26 +17,27 @@
     <div id="canvas-container" style="width: 100%; height: 100vh"></div>
 
     <script type="module">
+      import {MapGenerator} from "./app.js";
       import * as THREE from "three";
       // Assuming map is defined somewhere with width, height, and getElevation method
-      const map = {
-        width: 100,
-        height: 100,
-        getElevation: function (x, y) {
-          // Placeholder function: You can replace with your actual function
-          return Math.sin(x / 5) * Math.cos(y / 5) * 5;
-        },
-      };
+      // const map = {
+      //   width: 100,
+      //   height: 100,
+      //   getElevation: function (x, y) {
+      //     // Placeholder function: You can replace with your actual function
+      //     return Math.sin(x / 5) * Math.cos(y / 5) * 5;
+      //   },
+      // };
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
-        75,
+        90,
         window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
-      camera.position.z = 50;
-      camera.position.y = -50;
+      camera.position.z = 90;
+      camera.position.y = -90;
       camera.lookAt(0, 0, 0);
 
       const renderer = new THREE.WebGLRenderer();
@@ -64,42 +65,66 @@
       // const terrain = new THREE.Mesh(geometry, material);
       // scene.add(terrain);
 
-      const geometry = new THREE.BufferGeometry();
 
-// Generate vertices for the plane
-const vertices = [];
-for (let y = 0; y < map.height; y++) {
-    for (let x = 0; x < map.width; x++) {
-        vertices.push(x - map.width / 2, y - map.height / 2, map.getElevation(x, y));
-    }
-}
+      function generateTerrain(map) {
+        const geometry = new THREE.BufferGeometry();
+        // Generate vertices for the plane
+        const vertices = [];
+        for (let y = 0; y < map.height; y++) {
+          for (let x = 0; x < map.width; x++) {
+            vertices.push(
+              x - map.width / 2,
+              y - map.height / 2,
+              map.getElevation(x, y)
+            );
+          }
+        }
 
-// Create indices for the triangles of the plane
-const indices = [];
-for (let y = 0; y < map.height - 1; y++) {
-    for (let x = 0; x < map.width - 1; x++) {
-        const i1 = y * map.width + x;
-        const i2 = i1 + 1;
-        const i3 = i1 + map.width;
-        const i4 = i3 + 1;
+        // Create indices for the triangles of the plane
+        const indices = [];
+        for (let y = 0; y < map.height - 1; y++) {
+          for (let x = 0; x < map.width - 1; x++) {
+            const i1 = y * map.width + x;
+            const i2 = i1 + 1;
+            const i3 = i1 + map.width;
+            const i4 = i3 + 1;
 
-        // Add two triangles for the current quad
-        indices.push(i1, i2, i3);
-        indices.push(i2, i4, i3);
-    }
-}
+            // Add two triangles for the current quad
+            indices.push(i1, i2, i3);
+            indices.push(i2, i4, i3);
+          }
+        }
 
-geometry.setIndex(indices);
-geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(vertices, 3)
+        );
 
-const material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
-const terrain = new THREE.Mesh(geometry, material);
-scene.add(terrain);
+        const material = new THREE.MeshBasicMaterial({
+          color: 0x00ff00,
+          wireframe: true,
+        });
+        const terrain = new THREE.Mesh(geometry, material);
+        return terrain;
+      }
 
+      let mapGen = new MapGenerator(300, 300);
+
+      let map = mapGen.drawStuff();
+
+      let terrain = generateTerrain(map);
+      scene.add(terrain);
 
       function animate() {
-        requestAnimationFrame(animate);
+        let map = mapGen.drawStuff();
+        if (map) {
+          scene.remove(terrain);
+          terrain = generateTerrain(map);
+          scene.add(terrain);
+        }
         renderer.render(scene, camera);
+        requestAnimationFrame(animate);
       }
 
       animate();

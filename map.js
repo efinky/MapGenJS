@@ -100,4 +100,13 @@ export class Map {
     getMapPoint(x, y) {
         return this.rows[x][y];
     }
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {number}
+     */
+    getElevation(x, y){
+        return this.rows[x][y].elevation;
+    }
 }
