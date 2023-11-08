@@ -88,6 +88,7 @@ let map;
  * 
  * @param {Map} map 
  */
+/*
 export function updateMapMountain(map) {
 
     for (let i = 0; i < tempMap.width; i++) {
@@ -122,6 +123,7 @@ export function updateMapMountain(map) {
         }
     }
 }
+*/
 
 /**
  * 

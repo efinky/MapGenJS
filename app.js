@@ -6,7 +6,7 @@ import { Map, MapPoint } from "./map.js";
 import { genShoreline } from "./genShoreLine.js";
 import { genOcean } from "./genOcean.js";
 import { Regions} from "./genRegions.js";
-import { generateOutFromCenterMountain,  startGenerationMountain, updateMapMountain } from "./mountainGen.js";
+import { generateOutFromCenterMountain,  startGenerationMountain } from "./mountainGen.js";
 
 
 
