@@ -12,13 +12,14 @@ import { generateOutFromCenterMountain,  startGenerationMountain, updateMapMount
 
 export class MapGenerator {
     constructor() {
-        this.map = new Map(350, 350);
+        this.map = new Map(1000, 1000, 100);
         this.squareWidth = 2;
         this.smooth_i = 0
         this.smooth_j = 0;
         this.copied = false;
         this.keepGoingMountain = true;
         this.keepGoingRegion = true;
+        this.stepCount = Math.max(this.map.width, this.map.height) * 3;
 
         /**@type {number[][]} */
         this.smoothedMap = [];
@@ -34,12 +35,12 @@ export class MapGenerator {
         }
         
         //generate the shoreline
-        genShoreline(this.map.width, this.map);
+        genShoreline(this.map);
         genOcean(this.map);
         // genMountain(this.map);
-        //startGenerationMountain(this.map);
+        startGenerationMountain(this.map);
         
-        this.regions  = Regions.genRegions(this.map,85, 20, 9);
+        this.regions  = Regions.genRegions(this.map, 20, 9);
         //smoothMap();
         
     }
@@ -92,20 +93,20 @@ export class MapGenerator {
      drawStuff() {
 
         
-        if (this.keepGoingRegion){//} && !this.keepGoingMountain) {
+       /* if (this.keepGoingRegion){//} && !this.keepGoingMountain) {
             let steps = 0;
 
             while (this.keepGoingRegion) {
                 this.keepGoingRegion = this.regions.generateOutFromCenterRegion();
                 steps++;
-                if (steps > 1000) {
+                if (steps > this.stepCount) {
                     break;
                 }
             }
 
             this.regions.updateRegionMap(this.map);
             
-        }
+        }*/
 
         /*if (!this.keepGoingRegion &&this.keepGoingRegion2){//} && !this.keepGoingMountain) {
             let steps = 0;
@@ -121,25 +122,25 @@ export class MapGenerator {
             updateRegionMap(map);
         }*/
         
-        /*
-        if (this.keepGoingMountain) {
+        
+        if (this.keepGoingMountain) {//} && !this.keepGoingRegion) {
             let steps = 0;
 
             while (this.keepGoingMountain) {
                 this.keepGoingMountain = generateOutFromCenterMountain();
                 steps++;
-                if (steps > 1000) {
+                if (steps > this.stepCount) {
                     break;
                 }
             }
             
-            updateMapMountain(map);
+            updateMapMountain(this.map);
         }
-        */
+        
     
         
         
-        this.keepGoingMountain = false;
+        
 
        /* if (!this.copied) {
             copyMap();

@@ -20,15 +20,15 @@ class MountainMap {
      * @param {number} pWidth 
      * @param {number} pHeight 
      */
-    constructor(pWidth, pHeight) {
+    constructor(pWidth, pHeight, maxElevation) {
         this.width = pWidth;
         this.height = pHeight;
         this.rows = [];
         this.variation = 5;
         this.distOfVariation = 20;
-        this.maxElevation = 10;
+        this.maxElevation = maxElevation;
         this.minElevation = 1;
-        this.length = pWidth;
+        this.length = Math.min(this.width, this.height);
         this.buffer = Math.floor(this.length / 7);
     }
 
@@ -78,8 +78,7 @@ let points = [];
 let open = new LinkedList();
 
 /**@type {MountainMap} */
-// @ts-ignore
-let tempMap = null;
+let tempMap;
 
 
 
@@ -88,9 +87,8 @@ let tempMap = null;
  * @param {Map} map 
  */
 export function updateMapMountain(map) {
-    tempMap.length = map.width;
-    for (let i = 0; i < tempMap.length; i++) {
-        for (let j = 0; j < tempMap.length; j++) {
+    for (let i = 0; i < tempMap.width; i++) {
+        for (let j = 0; j < tempMap.height; j++) {
             //if we are over land then merge with the current elevation
             if (map.getMapPoint(i, j).type != "Ocean") {
                 if (tempMap.getMapSquare(i, j).elevation >= 1) {
@@ -122,13 +120,17 @@ export function updateMapMountain(map) {
     }
 }
 
+/**
+ * 
+ * @param {Map} map 
+ */
 function initMap(map) {
-    tempMap = new MountainMap(map.width, map.width);
+    tempMap = new MountainMap(map.width, map.height, map.maxElevation);
     
-    for (let i = 0; i < tempMap.length; i++) {
+    for (let i = 0; i < tempMap.width; i++) {
         /** @type {MapSquare[] } */
         let newRow = [];
-        for (let j = 0; j < tempMap.length; j++) {
+        for (let j = 0; j < tempMap.height; j++) {
             newRow.push(new MapSquare(-1, -1, 0, false, false, -1, i, j));
 
         }
@@ -148,8 +150,8 @@ export function startGenerationMountain(map) {
 
     //
     for (let i = 0; i < numPoints; i++) {
-        let x = randomNumber(tempMap.buffer, (tempMap.length - (tempMap.buffer * 2)));
-        let y = randomNumber(tempMap.buffer, (tempMap.length - (tempMap.buffer * 2)));
+        let x = randomNumber(tempMap.buffer, (tempMap.width - (tempMap.buffer * 2)));
+        let y = randomNumber(tempMap.buffer, (tempMap.height - (tempMap.buffer * 2)));
         points.push(new pointClass(x, y));
 
         //  
@@ -161,17 +163,17 @@ export function startGenerationMountain(map) {
     for (let i = 0; i < numRidges; i++) {
         let len = randomNumber(0, tempMap.buffer / 2)
 
-        let x = randomNumber(tempMap.buffer, tempMap.length - tempMap.buffer * 2);
-        let y = randomNumber(tempMap.buffer, tempMap.length - tempMap.buffer * 2);
+        let x = randomNumber(tempMap.buffer, tempMap.width - tempMap.buffer * 2);
+        let y = randomNumber(tempMap.buffer, tempMap.height - tempMap.buffer * 2);
         //
         points.push(new pointClass(x, y));
         for (let j = 0; j < len; j++) {
             let newX = x + randomNumber(0, 15) - randomNumber(0, 7)
             let newY = y + randomNumber(0, 15) - randomNumber(0, 7)
-            if (newX >= 0 && newX < tempMap.length) {
+            if (newX >= 0 && newX < tempMap.width) {
                 x = newX;
             }
-            if (newY >= 0 && newY < tempMap.length) {
+            if (newY >= 0 && newY < tempMap.height) {
                 y = newY;
             }
             points.push(new pointClass(x, y));
@@ -182,7 +184,7 @@ export function startGenerationMountain(map) {
     points.forEach(point => {
         let x = point.x;
         let y = point.y;
-        let max = randomNumber(tempMap.maxElevation - 2, tempMap.maxElevation);
+        let max = randomNumber(tempMap.maxElevation - Math.floor((20/100) *tempMap.maxElevation), tempMap.maxElevation);
         
         //
         tempMap.getMapSquare(x, y).elevation = max;
@@ -331,7 +333,7 @@ function getSurroundingSquaresElevation(square) {
     let tempArray = []
     for (let i = x - 1; i <= x + 1; i++) {
         for (let j = y - 1; j <= y + 1; j++) {
-            if (i >= 0 && j >= 0 && i < tempMap.length && j < tempMap.length) {
+            if (i >= 0 && j >= 0 && i < tempMap.width && j < tempMap.height) {
                 //
                 //
                 if (tempMap.getMapSquare(i, j).elevation != -1) {
@@ -368,7 +370,7 @@ function searchSurroundingSquares(parent) {
                     //cost for diagonal
                     cost = 14
                 }
-                if (i >= 0 && j >= 0 && i < tempMap.length && j < tempMap.length) {
+                if (i >= 0 && j >= 0 && i < tempMap.width && j < tempMap.height) {
                     let current = tempMap.getMapSquare(i, j);
                     TempcountCheck++;
                     if (!current) {

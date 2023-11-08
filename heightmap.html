@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Heightmap Visualization</title>
+    <style>
+      *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    </style>
     <script type="importmap">
       {
         "imports": {
@@ -37,8 +48,8 @@
         0.1,
         1000
       );
-      camera.position.z = 90;
-      camera.position.y = -90;
+      camera.position.z = 250;
+      camera.position.y = 250;
       camera.lookAt(0, 0, 0);
 
       const renderer = new THREE.WebGLRenderer();
@@ -79,8 +90,8 @@
             const elevation = map.getElevation(x, y);
             vertices.push(
               x - map.width / 2,
+              elevation,
               y - map.height / 2,
-              elevation
             );
             const color = new THREE.Color(
                 elevation < 3 ? 0x0000ff : (elevation < 7 ? 0x00ff00 : 0xffffff)
@@ -101,8 +112,10 @@
             const i4 = i3 + 1;
 
             // Add two triangles for the current quad
-            indices.push(i1, i2, i3);
-            indices.push(i2, i4, i3);
+            // indices.push(i1, i2, i3);
+            // indices.push(i2, i4, i3);
+            indices.push(i3, i2, i1);
+            indices.push(i3, i4, i2);
           }
         }
 
@@ -140,23 +153,28 @@
       const centerY = map.height / 2;
       const altitude = 500; // or any other value you deem high enough
 
-      directionalLight.position.set(centerX, altitude, centerY);
-      directionalLight.lookAt(centerX, 0, centerY);
+      directionalLight.position.set(0, altitude, 90 );
+      // directionalLight.lookAt(centerX, 0, centerY, );
+      directionalLight.lookAt(0, 0, 0, );
 
       // directionalLight.position.set(1, 1, 1).normalize();  // Coming from top-right-front
       scene.add(directionalLight);
 
 
-
+      let frame = 0;
 
       function animate() {
-        let map = mapGen.drawStuff();
-        if (map) {
-          scene.remove(terrain);
-          terrain = generateTerrain(map);
-          scene.add(terrain);
+        mapGen.drawStuff();
+        if (frame % 20 === 0) {
+          let map = mapGen.drawStuff();
+          if (map) {
+            scene.remove(terrain);
+            terrain = generateTerrain(map);
+            scene.add(terrain);
+          }
         }
         renderer.render(scene, camera);
+        frame++;
         requestAnimationFrame(animate);
       }
 

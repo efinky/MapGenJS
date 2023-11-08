@@ -10,22 +10,25 @@ import { randomNumber } from "./helpingFunctions.js";
  */
 let length = 0;
 /**@type {Map} */
-let map = new Map(0,0);
+let map;
 //^^ bad fix
 
 /**@type {Section[]} */
 let sections = [];
 /**@type {Point[]} */
 let points = [];
+let width;
+let height;
 /**
  * 
- * @param {number} pLength 
  * @param {Map} pMap 
  * 
  */
-export function genShoreline(pLength, pMap) {
-	length = pLength;
+export function genShoreline( pMap) {
 	map = pMap;
+	width = map.width;
+	height = map.height;
+	length = map.width;//Math.min(width, height);
 	createSections();
 	createPoints();
 	connectPoints();
@@ -57,7 +60,7 @@ function createSections() {
 	//nw->ne
 	//@sections.push(@section_struct.new x, y, newx, newy)
 	//for i in (1..numPoints)
-	while (newX + d + buffer <= length - offset - 1) {
+	while (newX + d + buffer <= width - offset - 1) {
 		x = newX + buffer
 		newX += d + buffer
 		//this is how I would randomize boxes
@@ -66,14 +69,14 @@ function createSections() {
 	}
 	sections.pop();
 
-	x = length - 1 - d - offset;
+	x = width - 1 - d - offset;
 	y = d + offset + buffer;
 	newX = x + d;
 	newY = y + d;
 	//ne->se
 	//sections.push(section_struct.new x, y, newx, newy)	
 	//for i in (2..numPoints)
-	while (newY + d + buffer <= length - offset - 1) {
+	while (newY + d + buffer <= height - offset - 1) {
 		y = newY + buffer;
 		newY += d + buffer;
 		sections.push({ x1: x, y1: y, x2: newX, y2: newY });
@@ -81,8 +84,8 @@ function createSections() {
 	}
 	sections.pop();
 
-	x = length - 1 - (d * 2) - offset - buffer;
-	y = length - 1 - d - offset;
+	x = width - 1 - (d * 2) - offset - buffer;
+	y = height - 1 - d - offset;
 	newX = x + d;
 	newY = y + d;
 	//se->sw
@@ -97,7 +100,7 @@ function createSections() {
 	sections.pop();
 
 	x = 0 + offset;
-	y = length - 1 - (d * 2) - offset - buffer;
+	y = height - 1 - (d * 2) - offset - buffer;
 	newX = x + d;
 	newY = y + d;
 	//sw->nw
@@ -147,26 +150,41 @@ function connectPoints() {
  */
 function map_section_edge(x, y, angle, tile_name) {
 
-	map.getMapPoint(check_xy(x),check_xy(y)).elevation = tile_name
-	map.getMapPoint(check_xy(x),check_xy(y)).type = "ShoreLine"
+	map.getMapPoint(check_x(x),check_y(y)).elevation = tile_name
+	map.getMapPoint(check_x(x),check_y(y)).type = "ShoreLine"
 	//nodes.push(point_struct.new x, y)
 	let point = update_x_y(x, y, angle)
 
 	return point
 }
+
 /**
  * 
- * @param {number} xy_value 
+ * @param {number} y_value 
  * @returns {number}
  */
-function check_xy(xy_value) {
-	if (xy_value >= length) {
-		xy_value = xy_value - length
+function check_y(y_value) {
+	if (y_value >= height) {
+		y_value = y_value - height
 	}
-	else if (xy_value < 0) {
-		xy_value = xy_value + (length)
+	else if (y_value < 0) {
+		y_value = y_value + (height)
 	}
-	return xy_value
+	return y_value
+}
+/**
+ * 
+ * @param {number} x_value 
+ * @returns {number}
+ */
+function check_x(x_value) {
+	if (x_value >= width) {
+		x_value = x_value - width
+	}
+	else if (x_value < 0) {
+		x_value = x_value + (width)
+	}
+	return x_value
 }
 
 /**

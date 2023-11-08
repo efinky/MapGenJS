@@ -57,12 +57,13 @@ export class Regions {
     /**
      *
      * @param {Map} map
-     * @param {number} maxElevation
      * @param {number} variation
      * @param {number} numRegions
      */
-    static genRegions(map, maxElevation, variation, numRegions) {
-        let regions = new Regions(maxElevation, variation, map);
+    static genRegions(map, variation, numRegions) {
+        //max elevation for regions should be 1/3 of total max elevations
+        let maxElev = Math.floor(.3*map.maxElevation);
+        let regions = new Regions(maxElev, variation, map);
         //initialize an empty map full of nodes
         for (let i = 0; i < map.width; i++) {
             let row = [];
@@ -76,7 +77,7 @@ export class Regions {
 
         //use the regions to generate "noisy" terrain
         for (let i = 0; i < numRegions; i++) {
-            regions.startGenRegion(randomNumber(4, Math.floor(maxElevation/2)), randomNumber(4, 5));
+            regions.startGenRegion(randomNumber(4, Math.floor(maxElev/2)), randomNumber(4, 5));
             //addNoise();
         }
         //	puts "adding noise..."

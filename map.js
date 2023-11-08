@@ -15,6 +15,7 @@ export class MapPoint {
         this.y = pY;
         this.elevation = elevation;
         this.type = type;
+        this.check = 0;
     }
 
     /**
@@ -29,7 +30,8 @@ export class MapPoint {
     draw() {
 
 
-        let color = this.rgbToHex(this.elevation*3, this.elevation*3, this.elevation*3)
+        let color = this.rgbToHex(this.elevation*2, this.elevation*2, this.elevation*2)
+  
         /*if (this.elevation === 0) {
     
             color = "#1E3357";
@@ -88,10 +90,11 @@ export class Map {
      * @param {number} pWidth 
      * @param {number} pHeight 
      */
-    constructor(pWidth, pHeight) {
+    constructor(pWidth, pHeight, maxElevation) {
         this.width = pWidth;
         this.height = pHeight;
         this.rows = [];
+        this.maxElevation = maxElevation;
     }
 
     /**
