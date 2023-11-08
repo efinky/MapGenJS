@@ -129,12 +129,12 @@ export class MapGenerator {
             while (this.keepGoingMountain) {
                 this.keepGoingMountain = generateOutFromCenterMountain();
                 steps++;
-                if (steps > this.stepCount) {
+                if (steps > 1000) {
                     break;
                 }
             }
             
-            updateMapMountain(this.map);
+            //updateMapMountain(this.map);
         }
         
     

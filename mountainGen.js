@@ -79,6 +79,8 @@ let open = new LinkedList();
 
 /**@type {MountainMap} */
 let tempMap;
+/**@type {Map} */
+let map;
 
 
 
@@ -87,6 +89,7 @@ let tempMap;
  * @param {Map} map 
  */
 export function updateMapMountain(map) {
+
     for (let i = 0; i < tempMap.width; i++) {
         for (let j = 0; j < tempMap.height; j++) {
             //if we are over land then merge with the current elevation
@@ -122,9 +125,10 @@ export function updateMapMountain(map) {
 
 /**
  * 
- * @param {Map} map 
+ * @param {Map} pMap 
  */
-function initMap(map) {
+function initMap(pMap) {
+    map = pMap
     tempMap = new MountainMap(map.width, map.height, map.maxElevation);
     
     for (let i = 0; i < tempMap.width; i++) {
@@ -141,10 +145,10 @@ function initMap(map) {
 
 
 /**
- * @param {Map} map 
+ * @param {Map} pMap 
  */
-export function startGenerationMountain(map) {
-    initMap(map);
+export function startGenerationMountain(pMap) {
+    initMap(pMap);
     let numPoints = 2//Math.floor(tempMap.length/100) + 1;
     // 
 
@@ -187,7 +191,8 @@ export function startGenerationMountain(map) {
         let max = randomNumber(tempMap.maxElevation - Math.floor((20/100) *tempMap.maxElevation), tempMap.maxElevation);
         
         //
-        tempMap.getMapSquare(x, y).elevation = max;
+        //tempMap.getMapSquare(x, y).elevation = max;
+        setElevations(max, x, y);
         tempMap.getMapSquare(x, y).direction = 0;
         tempMap.getMapSquare(x, y).closed = true;
         searchSurroundingSquares(tempMap.getMapSquare(x, y));
@@ -248,8 +253,28 @@ function checkCostAndSetElevation(square) {
     if (square.elevation == tempMap.maxElevation && test) {
         square.direction = -2;
     }
-    tempMap.getMapSquare(square.x, square.y).elevation = square.elevation
-    tempMap.getMapSquare(square.x, square.y).direction = square.direction
+    //tempMap.getMapSquare(square.x, square.y).elevation = square.elevation;
+    setElevations(square.elevation, square.x, square.y);
+    tempMap.getMapSquare(square.x, square.y).direction = square.direction;
+}
+function setElevations(elevation, x, y) {
+    tempMap.getMapSquare(x, y).elevation = elevation;
+    //if we are over land then merge with the current elevation
+    if (true) {//map.getMapPoint(x, y).type != "Ocean") {
+        if (tempMap.getMapSquare(x, y).elevation >= 1) {
+            if (map.getMapPoint(x, y).elevation == -1) {
+                map.getMapPoint(x, y).elevation = tempMap.getMapSquare(x, y).elevation;
+            }
+            else if (map.getMapPoint(x, y).elevation > tempMap.getMapSquare(x, y).elevation) {
+                //do nothing
+            }
+            else {
+                map.getMapPoint(x, y).elevation = tempMap.getMapSquare(x, y).elevation;
+            }
+            map.getMapPoint(x, y).type = "Land";
+        }
+    }
+    
 }
 /**
  * 
