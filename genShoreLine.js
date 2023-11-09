@@ -248,7 +248,7 @@ function find_center_angle(x1, y1, x2, y2) {
 }
 
 
-function genEdge(x1, y1, x2, y2, tile_name = 0) {
+function genEdge(x1, y1, x2, y2, tile_name = 5) {
 	let exit = false;
 	let x = x1;
 	let y = y1;

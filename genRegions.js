@@ -62,7 +62,7 @@ export class Regions {
      */
     static genRegions(map, variation, numRegions) {
         //max elevation for regions should be 1/3 of total max elevations
-        let maxElev = Math.floor(.3*map.maxElevation);
+        let maxElev = Math.floor(.2*map.maxElevation);
         let regions = new Regions(maxElev, variation, map);
         //initialize an empty map full of nodes
         for (let i = 0; i < map.width; i++) {

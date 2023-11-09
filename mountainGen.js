@@ -29,7 +29,7 @@ class MountainMap {
         this.maxElevation = maxElevation;
         this.minElevation = 1;
         this.length = Math.min(this.width, this.height);
-        this.buffer = Math.floor(this.length / 7);
+        this.buffer = Math.floor(this.length / 10);
     }
 
     /**
@@ -151,19 +151,19 @@ function initMap(pMap) {
  */
 export function startGenerationMountain(pMap) {
     initMap(pMap);
-    let numPoints = 2//Math.floor(tempMap.length/100) + 1;
+    let numPoints = 3//Math.floor(tempMap.length/100) + 1;
     // 
 
     //
     for (let i = 0; i < numPoints; i++) {
-        let x = randomNumber(tempMap.buffer, (tempMap.width - (tempMap.buffer * 2)));
-        let y = randomNumber(tempMap.buffer, (tempMap.height - (tempMap.buffer * 2)));
+        let x = randomNumber(tempMap.buffer, (tempMap.width - tempMap.buffer));
+        let y = randomNumber(tempMap.buffer, (tempMap.height - tempMap.buffer));
         points.push(new pointClass(x, y));
 
         //  
     }
 
-    let numRidges = Math.floor(numPoints/3) + 1;
+    let numRidges = 0;//Math.floor(numPoints/3) + 1;
     //
 
     for (let i = 0; i < numRidges; i++) {
@@ -190,7 +190,7 @@ export function startGenerationMountain(pMap) {
     points.forEach(point => {
         let x = point.x;
         let y = point.y;
-        let max = randomNumber(tempMap.maxElevation - Math.floor((20/100) *tempMap.maxElevation), tempMap.maxElevation);
+        let max = randomNumber(Math.floor(tempMap.maxElevation/2), tempMap.maxElevation);
         
         //
         //tempMap.getMapSquare(x, y).elevation = max;

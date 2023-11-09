@@ -23,6 +23,7 @@ export class MapGenerator {
 
         /**@type {number[][]} */
         this.smoothedMap = [];
+        this.smoothed = false;
 
         
         //populate map
@@ -71,29 +72,11 @@ export class MapGenerator {
             return -1
         }
     }
-    /**
-     * 
-     * @param {number} x 
-     * @param {number} y 
-     * @returns 
-     */
-    getSurroundingNodesElevation(x, y) {
-		let temp_a = []
-		for (let i = x-1; i <= x+1; i++) {
-			for (let j = y-1;j <= y+1; j++) {
-				if (i >= 0 && j >= 0 && i < this.map.width && j < this.map.height) {
-					if (this.smoothedMap[i][j] > 1) {
-						temp_a.push(this.smoothedMap[i][j]);
-					}
-				}
-			}
-		}
-		return temp_a
-	} 
-     drawStuff() {
+    
+    drawStuff() {
 
         
-       /* if (this.keepGoingRegion){//} && !this.keepGoingMountain) {
+       if (this.keepGoingRegion){//} && !this.keepGoingMountain) {
             let steps = 0;
 
             while (this.keepGoingRegion) {
@@ -106,7 +89,7 @@ export class MapGenerator {
 
             this.regions.updateRegionMap(this.map);
             
-        }*/
+        }
 
         /*if (!this.keepGoingRegion &&this.keepGoingRegion2){//} && !this.keepGoingMountain) {
             let steps = 0;
@@ -140,7 +123,9 @@ export class MapGenerator {
     
         
         
-        
+        /*if (!this.smoothed && !this.keepGoingMountain && !this.keepGoingRegion) {
+            //this.smoothed = this.smoothMap();
+        }*/
 
        /* if (!this.copied) {
             copyMap();
@@ -156,8 +141,53 @@ export class MapGenerator {
         } 
     }
 
+    smoothMap() {
+        //copy maps
+        for (let i = 0; i < this.map.width - 1; i++) {
+            let row = []
+            for (let j = 0; j < this.map.height - 1; j++) {
+                row.push(this.map.getMapPoint(i,j).elevation);
+            }
+            this.smoothedMap.push(row);
+        }
+        for (let i = 0; i < this.map.width - 1; i++) {
+            for (let j = 0; j < this.map.height - 1; j++) {
+            let tempArray = this.getSurroundingNodesElevation(i,j);
+            let temp = 0.0;
+            if (tempArray.length != 0) {
+                tempArray.forEach((elev) => {
+                    temp += elev;
+                });
+            } else {
+                temp = -1;
+            }
+            this.map.getMapPoint(i, j).elevation = Math.floor(temp);
+            }
+        }
+        return true;
+    }
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @returns 
+     */
+    getSurroundingNodesElevation(x, y) {
+		let temp_a = []
+		for (let i = x-1; i <= x+1; i++) {
+			for (let j = y-1;j <= y+1; j++) {
+				if (i >= 0 && j >= 0 && i < this.map.width && j < this.map.height) {
+					if (this.smoothedMap[i][j] > 1) {
+						temp_a.push(this.smoothedMap[i][j]);
+					}
+				}
+			}
+		}
+		return temp_a
+	} 
 
 }
+
 
 
 export async function run() {
