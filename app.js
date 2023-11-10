@@ -12,7 +12,7 @@ import { generateOutFromCenterMountain,  startGenerationMountain } from "./mount
 
 export class MapGenerator {
     constructor() {
-        this.map = new Map(1000, 1000, 100);
+        this.map = new Map(500, 500, 60);
         this.squareWidth = 2;
         this.smooth_i = 0
         this.smooth_j = 0;
@@ -24,6 +24,7 @@ export class MapGenerator {
         /**@type {number[][]} */
         this.smoothedMap = [];
         this.smoothed = false;
+        this.copied = false;
 
         
         //populate map
@@ -82,7 +83,7 @@ export class MapGenerator {
             while (this.keepGoingRegion) {
                 this.keepGoingRegion = this.regions.generateOutFromCenterRegion();
                 steps++;
-                if (steps > this.stepCount) {
+                if (steps > 1000) {
                     break;
                 }
             }
@@ -121,11 +122,16 @@ export class MapGenerator {
         }
         
     
+        //copy finished map to this.moothedMap as a backup to be used when calculating smoothness
+        if (!this.smoothed && !this.keepGoingMountain && !this.keepGoingRegion && !this.copied)
+        {
+            this.copyMap();
+        }
         
-        
-        /*if (!this.smoothed && !this.keepGoingMountain && !this.keepGoingRegion) {
-            //this.smoothed = this.smoothMap();
-        }*/
+        if (!this.smoothed && !this.keepGoingMountain && !this.keepGoingRegion && this.copied) {
+            this.smoothed = this.smoothMap();
+            console.log("smoothed")
+        }
 
        /* if (!this.copied) {
             copyMap();
@@ -133,7 +139,7 @@ export class MapGenerator {
         
         
     
-        if (!this.keepGoingMountain && !this.keepGoingRegion) {
+        if (!this.keepGoingMountain && !this.keepGoingRegion && !this.smoothed) {
             return null;
         }
         else {
@@ -141,27 +147,32 @@ export class MapGenerator {
         } 
     }
 
-    smoothMap() {
-        //copy maps
-        for (let i = 0; i < this.map.width - 1; i++) {
+    copyMap() {
+        for (let i = 0; i < this.map.width; i++) {
             let row = []
-            for (let j = 0; j < this.map.height - 1; j++) {
+            for (let j = 0; j < this.map.height; j++) {
                 row.push(this.map.getMapPoint(i,j).elevation);
             }
             this.smoothedMap.push(row);
         }
-        for (let i = 0; i < this.map.width - 1; i++) {
-            for (let j = 0; j < this.map.height - 1; j++) {
-            let tempArray = this.getSurroundingNodesElevation(i,j);
-            let temp = 0.0;
-            if (tempArray.length != 0) {
-                tempArray.forEach((elev) => {
-                    temp += elev;
-                });
-            } else {
-                temp = -1;
-            }
-            this.map.getMapPoint(i, j).elevation = Math.floor(temp);
+        this.copied = true;
+    }
+    smoothMap() {
+        //copy maps
+        
+        for (let i = 0; i < this.map.width; i++) {
+            for (let j = 0; j < this.map.height; j++) {
+                let tempArray = this.getSurroundingNodesElevation(i,j);
+                let temp = 0.0;
+                let div = tempArray.length;
+                if (tempArray.length != 0) {
+                    tempArray.forEach((elev) => {
+                        temp += elev;
+                    });
+                } else {
+                    temp = -1;
+                }
+                this.map.getMapPoint(i, j).elevation = Math.floor(temp/div);
             }
         }
         return true;
